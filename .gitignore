@@ -1,0 +1,10 @@
+#Virtual Environment
+.venv/
+
+#Python Cache
+__pycache__/
+
+#VSCode files
+.vscode/
+
+.DS_Store
