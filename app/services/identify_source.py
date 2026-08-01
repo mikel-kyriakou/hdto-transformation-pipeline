@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 
-from models.enums import Source
-from models.models import CustomMetadata
+from app.models.enums import Source
+from app.models.models import CustomMetadata
 
 
 class IdentifySourceService:
@@ -9,18 +9,16 @@ class IdentifySourceService:
     def __init__(self) -> None:
         pass
 
-    def identify_source(self, file_content: dict | list) -> Source | None:
-        if not isinstance(file_content, list):
-            file_content = [file_content]
+    def identify_source(self, file_content: list | dict) -> Source:
 
-        if all(self._is_europeana_item(item) for item in file_content):
+        if self._is_europeana_item(file_content):
             return Source.EUROPEANA
         elif all(self._is_dpla_item(item) for item in file_content):
             return Source.DPLA
         elif all(self._is_custom_item(item) for item in file_content):
             return Source.CUSTOM
         else:
-            return None
+            raise ValueError("Source not supported")
 
     def _is_europeana_item(self, file_content: dict) -> bool:
         if "europeanaAggregation" not in file_content:

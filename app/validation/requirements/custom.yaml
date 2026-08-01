@@ -1,0 +1,5 @@
+FIELDS:
+  REQUIRED:
+    - id
+    - title
+    - digital_file.file_url

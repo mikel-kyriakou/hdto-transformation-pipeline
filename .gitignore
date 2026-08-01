@@ -7,4 +7,5 @@ __pycache__/
 #VSCode files
 .vscode/
 
+#Mac Desktop Service Store
 .DS_Store
