@@ -1,5 +1,0 @@
-FIELDS:
-  REQUIRED:
-    - "@id"
-    - sourceResource.title
-    - object

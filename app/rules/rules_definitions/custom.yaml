@@ -1,0 +1,67 @@
+SOURCE: CUSTOM
+
+FIELDS:
+  REQUIRED:
+    - id
+    - title
+    - digital_file.file_url
+
+MAPPING:
+
+  id: 
+    PATH: id
+
+  title: 
+    PATH: title
+
+  object_type: 
+    PATH: object_type
+
+  material: 
+    PATH: material
+
+  collections:
+    id: 
+      PATH: null
+    title: 
+      PATH: null
+    description: 
+      PATH: null
+
+  representation: 
+    PATH: digital_file.representation
+
+  depiction: 
+    PATH: null
+
+  part_of: 
+    PATH: null
+
+  language: 
+    PATH: null
+
+  reference: 
+    PATH: id
+
+  creation_date: 
+    PATH: date_of_creation
+
+  destruction_date: 
+    PATH: null
+
+  place_of_creation: 
+    PATH: place_of_creation
+
+  place_of_destruction: 
+    PATH: null
+
+  created_by:
+    id: 
+      PATH: null
+    name: 
+      PATH: creator
+    role: 
+      PATH: null
+
+  digital_representation: 
+    PATH: digital_file.file_url

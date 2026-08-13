@@ -10,9 +10,17 @@ class Extractor:
     Returns None if the path does not exist or if the value is not found.
     """
 
-    def extract(self, record: dict, path: str) -> str | list | None:
+    def extract(self, record: dict, path: str | None, strategy: str | None = None) -> str | list | None:
+        if path is None:
+            return None
+
         parts = path.split(".")
-        return self._extract(record, parts)
+        result = self._extract(record, parts)
+
+        if strategy == "extract_first" and isinstance(result, list):
+            return result[0] if result else None
+
+        return result
 
     def _extract(self, value, parts) -> str | list | None:
 

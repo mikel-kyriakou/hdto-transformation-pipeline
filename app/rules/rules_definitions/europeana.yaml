@@ -1,0 +1,72 @@
+SOURCE: EUROPEANA
+
+FIELDS:
+  REQUIRED:
+    - about
+    - proxies[].dcTitle
+    - aggregations[].edmIsShownBy
+
+MAPPING:
+
+  id: 
+    PATH: about
+
+  title: 
+    PATH: proxies[].dcTitle
+
+  object_type: 
+    PATH: proxies[].dcType
+
+  material: 
+    PATH: proxies[].dcSubject
+
+  collections:
+    id: 
+      PATH: europeanaCollectionName
+
+    title: 
+      PATH: europeanaCollectionName
+
+    description: 
+      PATH: null
+
+  representation: 
+    PATH: aggregations[].edmIsShownBy
+
+  depiction: 
+    PATH: aggregations[].edmObject
+
+  part_of: 
+    PATH: null
+
+  language: 
+    PATH: proxies[].dcLanguage
+
+  reference: 
+    PATH: europeanaAggregation.edmLandingPage
+
+  creation_date: 
+    PATH: proxies[].dctermsCreated
+
+  destruction_date: 
+    PATH: null
+
+  place_of_creation: 
+    PATH: places[].prefLabel.def
+
+  place_of_destruction: 
+    PATH: null
+
+  created_by:
+    id: 
+      PATH: null
+
+    name: 
+      PATH: proxies[].dcCreator
+      STRATEGY: language_map
+
+    role: 
+      PATH: null
+
+  digital_representation: 
+    PATH: aggregations[].edmIsShownBy

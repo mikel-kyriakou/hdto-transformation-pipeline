@@ -1,5 +1,0 @@
-FIELDS:
-  REQUIRED:
-    - about
-    - proxies[].dcTitle
-    - aggregations[].edmIsShownBy

@@ -1,0 +1,78 @@
+SOURCE: DPLA
+
+FIELDS:
+  REQUIRED:
+    - "@id"
+    - sourceResource.title
+    - object
+
+MAPPING:
+  id: 
+    PATH: id
+
+  title: 
+    PATH: sourceResource.title
+    STRATEGY: extract_first
+
+  object_type: 
+    PATH: sourceResource.type
+    STRATEGY: extract_first
+
+  material: 
+    PATH: sourceResource.format
+    STRATEGY: extract_first
+
+  collections:
+    id: 
+      PATH: dataProvider.@id
+
+    title: 
+      PATH: dataProvider.name
+
+    description: 
+      PATH: null
+
+  representation: 
+    PATH: object
+
+  depiction: 
+    PATH: null
+
+  part_of: 
+    PATH: null
+
+  language: 
+    PATH: sourceResource.language[].name
+    STRATEGY: extract_first
+
+  reference: 
+    PATH: isShownAt
+
+  creation_date: 
+    PATH: sourceResource.date[].begin
+    STRATEGY: extract_first
+
+  destruction_date: 
+    PATH: sourceResource.date[].end
+    STRATEGY: extract_first
+
+  place_of_creation: 
+    PATH: sourceResource.spatial[].name
+    STRATEGY: extract_first
+
+  place_of_destruction: 
+    PATH: null
+
+  created_by:
+
+    id: 
+      PATH: null
+
+    name: 
+      PATH: sourceResource.creator
+
+    role: 
+      PATH: null
+
+  digital_representation: 
+    PATH: object

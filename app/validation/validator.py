@@ -1,19 +1,19 @@
 from typing import Annotated
 from fastapi import Depends
 
-from app.validation.loader import RequirementsLoader
+from app.rules.loader import RulesLoader
 from app.extraction.extractor import Extractor
 from app.models.enums import Source
 
 
 class RequirementsValidator:
 
-    def __init__(self, requirements_loader: RequirementsLoader, extractor: Extractor) -> None:
+    def __init__(self, requirements_loader: RulesLoader, extractor: Extractor) -> None:
         self.loader = requirements_loader
         self.extractor = extractor
 
     def validate(self, source: Source, file_content: list) -> None:
-        required_fields: list[str] = self.loader.load(source)
+        required_fields: list[str] = self.loader.load_requirements(source)
 
         for record in file_content:
             if not self.is_record_valid(record, required_fields):
@@ -30,7 +30,7 @@ class RequirementsValidator:
         return True
 
 def get_requirements_validator(
-        requirements_loader: Annotated[RequirementsLoader, Depends()],
+        requirements_loader: Annotated[RulesLoader, Depends()],
         extractor: Annotated[Extractor, Depends()]
 ) -> RequirementsValidator:
     return RequirementsValidator(

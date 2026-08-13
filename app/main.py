@@ -5,6 +5,7 @@ from fastapi import Depends
 from typing import Annotated
 
 from app.services.identify_source import IdentifySourceService, load_identify_source_service
+from app.services.temp import TempService, get_temp_service
 
 app = FastAPI()
 
@@ -22,3 +23,11 @@ async def upload_file(service: Annotated[IdentifySourceService, Depends(load_ide
         return {"error": "Invalid JSON file."}
     
     return service.identify_source(file_content)
+
+@app.post("/transform/temp")
+async def transform_temp(
+    service: Annotated[TempService, Depends(get_temp_service)],
+    file: UploadFile
+):
+
+    return await service.run(file)

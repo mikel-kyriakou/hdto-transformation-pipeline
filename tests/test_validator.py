@@ -8,7 +8,7 @@ class DummyRequirementsLoader:
     def __init__(self, requirements):
         self.requirements = requirements
 
-    def load(self, source):
+    def load_requirements(self, source):
         return self.requirements
 
 
