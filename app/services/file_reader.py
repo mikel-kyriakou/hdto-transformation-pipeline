@@ -9,6 +9,9 @@ class FileReader:
     async def read_file(file: UploadFile) -> dict:
         file_content_raw = await file.read()
         try:
-            return json.loads(file_content_raw)
+            content = json.loads(file_content_raw)
+            if isinstance(content, dict):
+                return [content]
+            return content
         except json.JSONDecodeError:
             return {"error": "Invalid JSON file."}

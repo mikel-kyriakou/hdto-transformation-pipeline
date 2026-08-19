@@ -13,12 +13,15 @@ MAPPING:
 
   title: 
     PATH: proxies[].dcTitle
+    STRATEGY: map_language_list
 
   object_type: 
     PATH: proxies[].dcType
+    STRATEGY: map_language_list
 
   material: 
     PATH: proxies[].dcSubject
+    STRATEGY: map_language_list
 
   collections:
     id: 
@@ -32,27 +35,34 @@ MAPPING:
 
   representation: 
     PATH: aggregations[].edmIsShownBy
+    STRATEGY: extract_first
 
   depiction: 
     PATH: aggregations[].edmObject
+    STRATEGY: extract_first
 
   part_of: 
     PATH: null
 
   language: 
-    PATH: proxies[].dcLanguage
+    # PATH: proxies[].dcLanguage
+    PATH: null
+    STRATEGY: map_language
 
   reference: 
     PATH: europeanaAggregation.edmLandingPage
 
   creation_date: 
-    PATH: proxies[].dctermsCreated
+    # PATH: proxies[].dctermsCreated
+    PATH: null
+    STRATEGY: map_language
 
   destruction_date: 
     PATH: null
 
   place_of_creation: 
-    PATH: places[].prefLabel.def
+    PATH: places[].prefLabel
+    STRATEGY: map_language_list
 
   place_of_destruction: 
     PATH: null
@@ -63,10 +73,11 @@ MAPPING:
 
     name: 
       PATH: proxies[].dcCreator
-      STRATEGY: language_map
+      STRATEGY: map_language
 
     role: 
       PATH: null
 
   digital_representation: 
     PATH: aggregations[].edmIsShownBy
+    STRATEGY: extract_first

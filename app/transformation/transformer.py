@@ -4,7 +4,7 @@ from fastapi import Depends
 from app.rules.loader import RulesLoader
 from app.extraction.extractor import Extractor
 from app.models.enums import Source
-from app.models.models import HeritageObjectData, Actor, CollectionData
+from app.models.models import HeritageObjectData, Actor
 
 
 class Transformer:
@@ -26,31 +26,36 @@ class Transformer:
                     object_type=self.extractor.extract(record, mapping_rules['object_type']['PATH'], strategy=mapping_rules['object_type'].get('STRATEGY')),
                     material=self.extractor.extract(record, mapping_rules['material']['PATH'], strategy=mapping_rules['material'].get('STRATEGY')),
                     collections=[],
-                    representation=self.extractor.extract(record, mapping_rules['representation']['PATH']),
-                    depiction=self.extractor.extract(record, mapping_rules['depiction']['PATH']),
-                    part_of=self.extractor.extract(record, mapping_rules['part_of']['PATH']),
+                    representation=self.extractor.extract(record, mapping_rules['representation']['PATH'], strategy=mapping_rules['representation'].get('STRATEGY')),
+                    depiction=self.extractor.extract(record, mapping_rules['depiction']['PATH'], strategy=mapping_rules['depiction'].get('STRATEGY')),
+                    part_of=self.extractor.extract(record, mapping_rules['part_of']['PATH'], strategy=mapping_rules['part_of'].get('STRATEGY')),
                     language=self.extractor.extract(record, mapping_rules['language']['PATH'], strategy=mapping_rules['language'].get('STRATEGY')),
-                    reference=self.extractor.extract(record, mapping_rules['reference']['PATH']),
+                    reference=self.extractor.extract(record, mapping_rules['reference']['PATH'], strategy=mapping_rules['reference'].get('STRATEGY')),
                     creation_date=self.extractor.extract(record, mapping_rules['creation_date']['PATH'], strategy=mapping_rules['creation_date'].get('STRATEGY')),
                     destruction_date=self.extractor.extract(record, mapping_rules['destruction_date']['PATH'], strategy=mapping_rules['destruction_date'].get('STRATEGY')),
                     place_of_creation=self.extractor.extract(record, mapping_rules['place_of_creation']['PATH'], strategy=mapping_rules['place_of_creation'].get('STRATEGY')),
                     place_of_destruction=self.extractor.extract(record, mapping_rules['place_of_destruction']['PATH'], strategy=mapping_rules['place_of_destruction'].get('STRATEGY')),
                     created_by=self.create_actors(self.extractor.extract(record, mapping_rules['created_by']['name']['PATH'], strategy=mapping_rules['created_by']['name'].get('STRATEGY'))),
-                    digital_representation=self.extractor.extract(record, mapping_rules['digital_representation']['PATH'])
+                    digital_representation=self.extractor.extract(record, mapping_rules['digital_representation']['PATH'], strategy=mapping_rules['digital_representation'].get('STRATEGY'))
                 )
             )
             
         return transformed_records
 
     def create_actors(self, value: list | str) -> list[Actor]:
+        print(f"Creating actors from value: {value}")
         if value is None:
             return []
         
         if isinstance(value, str):
             value = [value]
 
+        print(f"Creating actors from value (after ensuring list): {value}")
+
+
         actors = []
         for actor in value:
+            print(f"Creating Actor object for: {actor}")
             actors.append(Actor(name=actor))
 
         return actors

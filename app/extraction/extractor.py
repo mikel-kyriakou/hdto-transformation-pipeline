@@ -11,14 +11,37 @@ class Extractor:
     """
 
     def extract(self, record: dict, path: str | None, strategy: str | None = None) -> str | list | None:
+        print(f"Extracting path: {path} with strategy: {strategy}")
         if path is None:
             return None
 
         parts = path.split(".")
         result = self._extract(record, parts)
 
-        if strategy == "extract_first" and isinstance(result, list):
-            return result[0] if result else None
+        print(f"Extracted result before strategy: {result}")
+
+        match strategy:
+            case "extract_first":
+                if isinstance(result, list):
+                    return result[0] if result else None
+                
+            case "map_language":
+                if isinstance(result, dict):
+                    return self._map_language(result)
+                elif isinstance(result, list):
+                    return [self._map_language(item) for item in result]
+
+            case "map_language_list":
+                if isinstance(result, dict):
+                    result = self._map_language(result)
+                elif isinstance(result, list):
+                    result = [self._map_language(item) for item in result]
+
+                if isinstance(result, list):
+                    return next((item for item in result if item is not None), None)
+
+                return result
+                
 
         return result
 
@@ -57,3 +80,27 @@ class Extractor:
             return None
 
         return self._extract(value[part], parts[1:])
+
+    def _map_language(self, value: dict) -> list | str | None:
+
+        print(f"Step 1: {value}")
+        if not isinstance(value, dict):
+            return value
+
+        print(f"Step 2: {value}")
+
+        if "def" in value:
+            value = value["def"]
+        elif "en" in value:
+            value = value["en"]
+        else:
+            value = next(iter(value.values()), None)
+
+        print(f"Step 3: {value}")
+
+        if isinstance(value, list):
+            return value[0] if len(value) > 0 else None
+
+        print(f"Step 4: {value}")
+
+        return value

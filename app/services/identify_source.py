@@ -11,7 +11,7 @@ class IdentifySourceService:
 
     def identify_source(self, file_content: list | dict) -> Source:
 
-        if self._is_europeana_item(file_content):
+        if all(self._is_europeana_item(item) for item in file_content):
             return Source.EUROPEANA
         elif all(self._is_dpla_item(item) for item in file_content):
             return Source.DPLA
