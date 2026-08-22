@@ -6,9 +6,6 @@ from app.models.models import CustomMetadata
 
 class IdentifySourceService:
 
-    def __init__(self) -> None:
-        pass
-
     def identify_source(self, file_content: list | dict) -> Source:
 
         if all(self._is_europeana_item(item) for item in file_content):

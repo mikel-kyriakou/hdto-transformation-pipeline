@@ -44,6 +44,7 @@ class HeritageObjectData(BaseModel):
     representation: str | None = None #the id of the digital file representation
     depiction: str | None = None #the id of the digital file depiction
     part_of: str | None = None #the id of the heritage object that this object is part of
+
     language: str | None = None
     reference: str | None = None
 

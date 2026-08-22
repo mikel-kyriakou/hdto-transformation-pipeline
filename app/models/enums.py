@@ -5,3 +5,7 @@ class Source(StrEnum):
     EUROPEANA = "Europeana"
     DPLA = "DPLA"
     CUSTOM = "Custom"
+
+class OutputFormat(StrEnum):
+    TTL = "turtle"
+    XML = "xml"
