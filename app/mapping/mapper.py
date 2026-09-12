@@ -1,7 +1,7 @@
 from rdflib import Namespace, Graph, URIRef, Literal
-from rdflib.namespace import RDF, XSD
+from rdflib.namespace import RDF, XSD, GEO
 
-from app.models.models import HeritageObjectData
+from app.models.models import HeritageObjectData, Place, Actor, Collection
 
 CIDOC = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 RHDTO = Namespace("https://vast-lab.org/rhdto/")
@@ -38,7 +38,7 @@ class Mapper:
 
             self._add_material(graph, object_instance, index, obj.material)
 
-            # self._add_collections()
+            self._add_collections(graph, object_instance, index, obj.collections)
 
             self._add_representation(graph, object_instance, index, obj.representation)
             # self._add_depiction
@@ -53,7 +53,7 @@ class Mapper:
             self._add_place_of_creation(graph, object_instance, index, obj.place_of_creation)
             self._add_place_of_destruction(graph, object_instance, index, obj.place_of_destruction)
 
-            # self._add_creators()
+            self._add_creators(graph, object_instance, index, obj.created_by)
 
             self._add_digital_representation(graph, object_instance, index, obj.digital_representation)
 
@@ -77,47 +77,59 @@ class Mapper:
 
         graph.add((object_instance, self.cidoc_crm.P48_has_preferred_identifier, identifier_instance))
 
-    def _add_title(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_title(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
 
         if value is None:
             return
 
-        title_instance = self._create_instance_with_literal(
-            graph=graph,
-            instance_id=f"title-{instance_index}",
-            class_type=self.cidoc_crm.E35_Title,
-            literal_value=value
-        )
+        if isinstance(value, str):
+            value=[value]
 
-        graph.add((object_instance, self.cidoc_crm.P102_has_title, title_instance))
+        for value_index, value_str in enumerate(value):
+            title_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"title-{instance_index}-{value_index}",
+                class_type=self.cidoc_crm.E35_Title,
+                literal_value=value_str
+            )
 
-    def _add_type(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+            graph.add((object_instance, self.cidoc_crm.P102_has_title, title_instance))
 
-        if value is None:
-            return
-
-        type_instance = self._get_or_create_instance_with_literal(
-            graph=graph,
-            instance_id=f"type-{instance_index}",
-            class_type=self.cidoc_crm.E55_Type,
-            literal_value=value
-        )
-
-        graph.add((object_instance, self.cidoc_crm.P2_has_type, type_instance))
-
-    def _add_material(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_type(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
 
         if value is None:
             return
 
-        material_instance = self._get_or_create_instance_with_literal(
-            graph=graph,
-            instance_id=f"material-{instance_index}",
-            class_type=self.cidoc_crm.E57_Material,
-            literal_value=value
-        )
+        if isinstance(value, str):
+            value = [value]
 
-        graph.add((object_instance, self.cidoc_crm.P45_consists_of, material_instance))
+        for value_index, value_str in enumerate(value):
+            type_instance = self._get_or_create_instance_with_literal(
+                graph=graph,
+                instance_id=f"type-{instance_index}-{value_index}",
+                class_type=self.cidoc_crm.E55_Type,
+                literal_value=value_str
+            )
+
+            graph.add((object_instance, self.cidoc_crm.P2_has_type, type_instance))
+
+    def _add_material(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
+
+        if value is None:
+            return
+
+        if isinstance(value, str):
+            value = [value]
+
+        for value_index, value_str in enumerate(value):
+            material_instance = self._get_or_create_instance_with_literal(
+                graph=graph,
+                instance_id=f"material-{instance_index}-{value_index}",
+                class_type=self.cidoc_crm.E57_Material,
+                literal_value=value_str
+            )
+
+            graph.add((object_instance, self.cidoc_crm.P45_consists_of, material_instance))
 
     def _add_representation(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
 
@@ -133,26 +145,30 @@ class Mapper:
 
         graph.add((object_instance, self.cidoc_crm.P138_has_representation, representation_instance))
 
-    def _add_language(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_language(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
 
         if value is None:
             return
+
+        if isinstance(value, str):
+            value=[value]
 
         linguistic_obj_instance = self._get_or_create_instance(
             graph=graph,
             instance_id=f"linguistic-object-{instance_index}",
             class_type=self.cidoc_crm.E33_Linguistic_Object,
         )
-
-        language_instance = self._get_or_create_instance_with_literal(
-            graph=graph,
-            instance_id=f"language-{instance_index}",
-            class_type=self.cidoc_crm.E56_Language,
-            literal_value=value,
-        )
-
         graph.add((object_instance, self.cidoc_crm.P128_carries, linguistic_obj_instance))
-        graph.add((linguistic_obj_instance, self.cidoc_crm.P72_has_language, language_instance))
+
+        for value_index, value_str in enumerate(value):
+            language_instance = self._get_or_create_instance_with_literal(
+                graph=graph,
+                instance_id=f"language-{instance_index}-{value_index}",
+                class_type=self.cidoc_crm.E56_Language,
+                literal_value=value_str,
+            )
+            
+            graph.add((linguistic_obj_instance, self.cidoc_crm.P72_has_language, language_instance))
 
     def _add_reference(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
 
@@ -219,9 +235,9 @@ class Mapper:
         graph.add((eoe_instance, self.cidoc_crm.P93_took_out_of_existence, object_instance))
         graph.add((eoe_instance, self.cidoc_crm["P4_has_time-span"], time_span_instance))
 
-    def _add_place_of_creation(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_place_of_creation(self, graph: Graph, object_instance: URIRef, instance_index: int, place: Place | None) -> None:
 
-        if value is None:
+        if place is None:
             return
 
         boe_instance = self._get_or_create_instance(
@@ -230,19 +246,18 @@ class Mapper:
             class_type=self.cidoc_crm.E63_Beginning_of_Existence
         )
 
-        place_instance = self._get_or_create_instance_with_literal(
+        place_instance = self._get_or_create_place_instance(
             graph=graph,
             instance_id=f"place-instance-{instance_index}",
-            class_type=self.cidoc_crm.E53_Place,
-            literal_value=value
+            place=place
         )
 
         graph.add((boe_instance, self.cidoc_crm.P92_brought_into_existence, object_instance))
         graph.add((boe_instance, self.cidoc_crm.P7_took_place_at , place_instance))
 
-    def _add_place_of_destruction(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_place_of_destruction(self, graph: Graph, object_instance: URIRef, instance_index: int, place: Place | None) -> None:
 
-        if value is None:
+        if place is None:
             return
 
         eoe_instance = self._get_or_create_instance(
@@ -251,28 +266,36 @@ class Mapper:
             class_type=self.cidoc_crm.E64_End_of_Existence
         )
 
-        place_instance = self._get_or_create_instance_with_literal(
+        place_instance = self._get_or_create_place_instance(
             graph=graph,
             instance_id=f"place-instance-{instance_index}",
-            class_type=self.cidoc_crm.E53_Place,
-            literal_value=value
+            place=place
         )
 
         graph.add((eoe_instance, self.cidoc_crm.P93_took_out_of_existence, object_instance))
         graph.add((eoe_instance, self.cidoc_crm.P7_took_place_at , place_instance))
 
-    # def _add_creators(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
+    def _add_creators(self, graph: Graph, object_instance: URIRef, instance_index: int, actors: list[Actor] | None) -> None:
 
-    #     if value is None:
-    #         return
+        if actors is None:
+            return
 
-    #     boe_instance = self._get_or_create_instance(
-    #         graph=graph,
-    #         instance_id=f"beginning-of-existence-{instance_index}",
-    #         class_type=self.cidoc_crm.E63_Beginning_of_Existence
-    #     )
+        boe_instance = self._get_or_create_instance(
+            graph=graph,
+            instance_id=f"beginning-of-existence-{instance_index}",
+            class_type=self.cidoc_crm.E63_Beginning_of_Existence
+        )
 
-    #     actor_instance = self
+        for actor in actors:
+            actor_instance = self._get_or_create_actor_instance(
+                graph=graph,
+                instance_id=f"actor-{instance_index}",
+                actor=actor
+            )
+
+            graph.add((boe_instance, self.cidoc_crm.P11_had_participant, actor_instance))
+
+        graph.add((boe_instance, self.cidoc_crm.P92_brought_into_existence, object_instance))
 
     def _add_digital_representation(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | None) -> None:
 
@@ -288,6 +311,20 @@ class Mapper:
         )
 
         graph.add((object_instance, self.rhdto.HP22_has_digital_representation, digital_repr_instance))
+
+    def _add_collections(self, graph: Graph, object_instance: URIRef, instance_index: int, collections: list[Collection] | None) -> None:
+
+        if not collections:
+            return None
+
+        for collection in collections:
+            collection_instance = self._get_or_create_collection_instance(
+                graph=graph,
+                instance_id=f"collection-{instance_index}",
+                collection=collection
+            )
+
+            graph.add((object_instance, self.cidoc_crm.P46_forms_part_of, collection_instance))
 
     # ---------------------------------------------------------
     # Generic RDF creation methods
@@ -332,6 +369,121 @@ class Mapper:
 
         return instance
 
+    def _get_or_create_place_instance(self, graph: Graph, instance_id: str, place: Place) -> URIRef:
+        if place.name:
+            instance_key = (self.cidoc_crm.E53_Place, place.name)
+            if instance_key in self.instance_registry:
+                return self.instance_registry[instance_key]
+
+        place_instance = self._create_instance(graph, instance_id, self.cidoc_crm.E53_Place)
+
+        if place.latitude is not None and place.longitude is not None:
+            wkt = Literal(
+                f"POINT({place.longitude} {place.latitude})",
+                datatype=GEO.wktLiteral
+            )
+
+            space_instance = self._create_instance(graph, f"{instance_id}-space", self.cidoc_crm.E94_Space_Primitive)
+
+            graph.add((space_instance, GEO.asWKT, wkt))
+            graph.add((space_instance, self.cidoc_crm.P168_defines_place, place_instance))
+
+        if place.name:
+
+            graph.add((place_instance, self.cidoc_crm.P190_has_symbolic_content, Literal(place.name, datatype=XSD.string)))
+
+            instance_key = (self.cidoc_crm.E53_Place, place.name)
+            self.instance_registry[instance_key] = place_instance
+
+        return place_instance
+
+    def _get_or_create_actor_instance(self, graph: Graph, instance_id: str, actor: Actor) -> URIRef:
+        if actor.id:
+            instance_key = (self.cidoc_crm.E39_Actor, actor.id)
+
+            if instance_key in self.instance_registry:
+                return self.instance_registry[instance_key]
+
+        actor_instance = self._create_instance(
+            graph=graph,
+            instance_id=instance_id,
+            class_type=self.cidoc_crm.E39_Actor
+        )
+
+        if actor.name:
+            name_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"{instance_id}-name",
+                class_type=self.cidoc_crm.E41_Appellation,
+                literal_value=actor.name
+            )
+
+            graph.add((actor_instance, self.cidoc_crm.P1_is_identified_by, name_instance))
+
+        if actor.id:
+            identifier_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"{instance_id}-identifier",
+                class_type=self.cidoc_crm.E42_Identifier,
+                literal_value=actor.id
+            )
+
+            graph.add((actor_instance, self.cidoc_crm.P48_has_preferred_identifier, identifier_instance))
+
+            instance_key = (self.cidoc_crm.E39_Actor, actor.id)
+            self.instance_registry[instance_key] = actor_instance
+
+        return actor_instance
+
+    def _get_or_create_collection_instance(self, graph: Graph, instance_id: str, collection: Collection) -> URIRef:
+        if collection.id:
+            instance_key = (self.cidoc_crm.E78_Curated_Holding, collection.id)
+
+            if instance_key in self.instance_registry:
+                return self.instance_registry[instance_key]
+
+        collection_instance = self._create_instance(
+            graph=graph,
+            instance_id=instance_id,
+            class_type=self.cidoc_crm.E78_Curated_Holding
+        )
+
+        if collection.title:
+            appellation_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"{instance_id}-appellation",
+                class_type=self.cidoc_crm.E41_Appellation,
+                literal_value=collection.title
+            )
+
+            graph.add((appellation_instance, self.cidoc_crm.P1_is_identified_by, appellation_instance))
+
+        if collection.description:
+            description_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"{instance_id}-description",
+                class_type=self.cidoc_crm.E62_String,
+                literal_value=collection.description
+            )
+
+            graph.add((description_instance, self.cidoc_crm.P3_has_note, description_instance))
+
+        if collection.id:
+            identifier_instance = self._create_instance_with_literal(
+                graph=graph,
+                instance_id=f"{instance_id}-identifier",
+                class_type=self.cidoc_crm.E42_Identifier,
+                literal_value=collection.id
+            )
+
+            graph.add((collection_instance, self.cidoc_crm.P48_has_preferred_identifier, identifier_instance))
+
+            instance_key = (self.cidoc_crm.E78_Curated_Holding, collection.id)
+            self.instance_registry[instance_key] = collection_instance
+
+        return collection_instance
+
+
 def get_mapper() -> Mapper:
     return Mapper()
 
@@ -348,7 +500,7 @@ if __name__ == "__main__":
         # ),
         HeritageObjectData(
             id="2",
-            title="Test Object 2",
+            title=["Test Object 2", "Another Title"],
             object_type="Test Type 2",
             material="Test Material 2",
             representation="https://aueb.gr/repr-url",

@@ -8,29 +8,30 @@ FIELDS:
 
 MAPPING:
   id: 
-    PATH: id
+    PATH: "@id"
 
   title: 
     PATH: sourceResource.title
+  
+  description:
+    PATH: sourceResource.description[]
     STRATEGY: extract_first
 
   object_type: 
     PATH: sourceResource.type
-    STRATEGY: extract_first
 
   material: 
-    PATH: sourceResource.format
-    STRATEGY: extract_first
+    PATH: sourceResource.physicalMedium
 
   collections:
     id: 
-      PATH: dataProvider.@id
+      PATH: sourceResource.collection[].@id
 
     title: 
-      PATH: dataProvider.name
+      PATH: sourceResource.collection[].title
 
     description: 
-      PATH: null
+      PATH: sourceResource.collection[].description
 
   representation: 
     PATH: object
@@ -43,10 +44,9 @@ MAPPING:
 
   language: 
     PATH: sourceResource.language[].name
-    STRATEGY: extract_first
 
   reference: 
-    PATH: isShownAt
+    PATH: null
 
   creation_date: 
     PATH: sourceResource.date[].begin
@@ -57,22 +57,32 @@ MAPPING:
     STRATEGY: extract_first
 
   place_of_creation: 
-    PATH: sourceResource.spatial[].name
-    STRATEGY: extract_first
+    name:
+      PATH: sourceResource.spatial[].name
+      STRATEGY: extract_first
+    
+    latitude:
+      PATH: null
+    
+    longitude:
+      PATH: null
 
-  place_of_destruction: 
-    PATH: null
+  place_of_destruction:
+    name:
+      PATH: null
+    
+    latitude:
+      PATH: null
+    
+    longitude:
+      PATH: null
 
   created_by:
-
     id: 
       PATH: null
 
     name: 
       PATH: sourceResource.creator
-
-    role: 
-      PATH: null
 
   digital_representation: 
     PATH: object

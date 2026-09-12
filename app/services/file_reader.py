@@ -6,11 +6,11 @@ from fastapi import UploadFile
 class FileReader:
     
     @staticmethod
-    async def read_file(file: UploadFile) -> dict:
+    async def read_file(file: UploadFile) -> list | dict:
         file_content_raw = await file.read()
         try:
             content = json.loads(file_content_raw)
-            if isinstance(content, dict):
+            if not isinstance(content, list):
                 return [content]
             return content
         except json.JSONDecodeError:

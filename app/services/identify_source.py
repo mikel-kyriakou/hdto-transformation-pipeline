@@ -20,11 +20,11 @@ class IdentifySourceService:
     def _is_europeana_item(self, file_content: dict) -> bool:
         if "europeanaAggregation" not in file_content:
             return False
-        
+
         europeana_aggregation = file_content["europeanaAggregation"]
         if "about" not in europeana_aggregation:
             return False
-        
+
         about = europeana_aggregation["about"]
         return about.startswith("/aggregation/europeana/")
             

@@ -13,6 +13,9 @@ MAPPING:
 
   title: 
     PATH: title
+  
+  description:
+    PATH: null
 
   object_type: 
     PATH: object_type
@@ -50,11 +53,24 @@ MAPPING:
     PATH: null
 
   place_of_creation: 
-    PATH: place_of_creation
+    name:
+      PATH: place_of_creation
+    
+    latitude:
+      PATH: null
+    
+    longitude:
+      PATH: null
 
   place_of_destruction: 
-    PATH: null
-
+    name:
+      PATH: null
+    
+    latitude:
+      PATH: null
+    
+    longitude:
+      PATH: null
   created_by:
     id: 
       PATH: null

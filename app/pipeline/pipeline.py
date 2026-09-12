@@ -26,7 +26,9 @@ class Pipeline:
 
     async def execute(self, file: UploadFile, output_format: OutputFormat):
         file_content = await self.file_reader.read_file(file)
-        
+        if isinstance(file_content, dict):
+            raise Exception("Invalid input")
+
         source = self.source_identifier.identify_source(file_content)
 
         self.requirements_validator.validate(source, file_content)

@@ -10,73 +10,88 @@ MAPPING:
 
   id: 
     PATH: about
+    STRATEGY: add_europeana_base_url
 
   title: 
     PATH: proxies[].dcTitle
-    STRATEGY: map_language_list
+    STRATEGY: map_language
+  
+  description:
+    PATH: proxies[].dcDescription
+    STRATEGY: map_language
 
   object_type: 
     PATH: proxies[].dcType
-    STRATEGY: map_language_list
+    STRATEGY: map_language
 
   material: 
-    PATH: proxies[].dcSubject
-    STRATEGY: map_language_list
+    PATH: proxies[].dcTermsMedium
+    STRATEGY: resolve_concept
 
   collections:
     id: 
-      PATH: europeanaCollectionName
+      PATH: null
 
     title: 
-      PATH: europeanaCollectionName
+      PATH: null
 
     description: 
       PATH: null
 
   representation: 
-    PATH: aggregations[].edmIsShownBy
-    STRATEGY: extract_first
+    PATH: europeanaAggregation.edmPreview
 
   depiction: 
-    PATH: aggregations[].edmObject
-    STRATEGY: extract_first
+    PATH: null
 
   part_of: 
     PATH: null
 
   language: 
-    # PATH: proxies[].dcLanguage
-    PATH: null
+    PATH: proxies[].dcLanguage
     STRATEGY: map_language
 
   reference: 
     PATH: europeanaAggregation.edmLandingPage
 
   creation_date: 
-    # PATH: proxies[].dctermsCreated
-    PATH: null
-    STRATEGY: map_language
+    PATH: proxies[].dctermsCreated
+    STRATEGY: map_language_extract_first_remove_hashtag
 
   destruction_date: 
     PATH: null
 
   place_of_creation: 
-    PATH: places[].prefLabel
-    STRATEGY: map_language_list
+    name:
+      PATH: proxies[].dctermsSpatial
+      STRATEGY: resolve_place_name
+    
+    latitude:
+      PATH: proxies[].dctermsSpatial
+      STRATEGY: resolve_place_lat
+      
+    longitude:
+      PATH: proxies[].dctermsSpatial
+      STRATEGY: resolve_place_long    
 
   place_of_destruction: 
-    PATH: null
+    name:
+      PATH: null
+    
+    latitude:
+      PATH: null
+      
+    longitude:
+      PATH: null
 
   created_by:
     id: 
-      PATH: null
+      PATH: proxies[].dcCreator
+      STRATEGY: resolve_europeana_creator_id
 
     name: 
       PATH: proxies[].dcCreator
-      STRATEGY: map_language
-
-    role: 
-      PATH: null
+      STRATEGY: resolve_europeana_creator_name
 
   digital_representation: 
     PATH: aggregations[].edmIsShownBy
