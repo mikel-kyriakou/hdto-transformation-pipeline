@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 
+from app.models.enums import MediaType
+from app.models.enums import Source
+
 
 class DigitalFile(BaseModel):
     file_type: str
@@ -49,8 +52,8 @@ class HeritageObjectData(BaseModel):
     collections: list[Collection] | None = None
 
     representation: str | None = None #the id of the digital file representation
-    depiction: str | None = None #the id of the digital file depiction | is this the same with representation?
-    part_of: str | None = None #the id of the heritage object that this object is part of
+    # depiction: str | None = None #the id of the digital file depiction | is this the same with representation?
+    # part_of: str | None = None #the id of the heritage object that this object is part of
 
     language: str | list[str] | None = None
     reference: str | None = None
@@ -64,3 +67,18 @@ class HeritageObjectData(BaseModel):
     created_by: list[Actor] | None = None
 
     digital_representation: str | None = None #the 3d model
+
+
+class PipelineMetrics(BaseModel):
+    identified_source: Source | None = None
+    records_processed: int | None = None
+    records_valid: int | None = None
+    records_invalid: int | None = None
+    triples_generated: int | None = None
+    duration_s: int | float | None = None
+    items_per_class: dict[str, int] = {}
+
+class PipelineResponse(BaseModel):
+    content: str
+    format: MediaType
+    metrics: PipelineMetrics

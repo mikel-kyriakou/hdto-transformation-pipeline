@@ -1,3 +1,4 @@
+import time
 from fastapi import UploadFile, Depends
 from typing import Annotated
 
@@ -7,6 +8,9 @@ from app.validation.validator import RequirementsValidator, get_requirements_val
 from app.transformation.transformer import Transformer, get_transformer
 from app.mapping.mapper import Mapper, get_mapper
 from app.models.enums import OutputFormat
+from app.models.models import PipelineResponse
+from app.models.models import PipelineMetrics
+from app.metrics.metrics_generator import MetricsGenerator
 
 
 class Pipeline:
@@ -24,20 +28,34 @@ class Pipeline:
         self.transformer = transformer
         self.mapper = mapper
 
-    async def execute(self, file: UploadFile, output_format: OutputFormat):
+    async def execute(self, file: UploadFile, output_format: OutputFormat) -> PipelineResponse:
+        start = time.perf_counter()
+
         file_content = await self.file_reader.read_file(file)
         if isinstance(file_content, dict):
             raise Exception("Invalid input")
 
         source = self.source_identifier.identify_source(file_content)
 
-        self.requirements_validator.validate(source, file_content)
+        validated_objects = self.requirements_validator.validate(source, file_content)
 
-        intermediate_objects = self.transformer.transform(source, file_content)
+        intermediate_objects = self.transformer.transform(source, validated_objects)
 
         graph = self.mapper.map(intermediate_objects)
 
-        return graph.serialize(format=output_format)
+        return PipelineResponse(
+            content=graph.serialize(format=output_format),
+            format=output_format.media_type,
+            metrics=PipelineMetrics(
+                identified_source=source,
+                records_processed=len(file_content),
+                records_valid=len(validated_objects),
+                records_invalid=len(file_content)-len(validated_objects),
+                triples_generated=len(graph),
+                duration_s=round(time.perf_counter() - start, 3),
+                items_per_class=MetricsGenerator.items_per_class(graph)
+            )
+        )
 
 def build_pipeline(
         file_reader: Annotated[FileReader, Depends()],

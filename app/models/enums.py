@@ -9,3 +9,12 @@ class Source(StrEnum):
 class OutputFormat(StrEnum):
     TTL = "turtle"
     XML = "xml"
+
+    @property
+    def media_type(self) -> "MediaType":
+        return MediaType[self.name]
+
+
+class MediaType(StrEnum):
+    TTL = "text/turtle"
+    XML = "application/rdf+xml"

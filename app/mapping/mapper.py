@@ -31,11 +31,10 @@ class Mapper:
             )
 
             self._add_identifier(graph, object_instance, index, obj.id)
-
             self._add_title(graph, object_instance, index, obj.title)
+            self._add_description(graph, object_instance, index, obj.description)
 
             self._add_type(graph, object_instance, index, obj.object_type)
-
             self._add_material(graph, object_instance, index, obj.material)
 
             self._add_collections(graph, object_instance, index, obj.collections)
@@ -48,7 +47,7 @@ class Mapper:
             self._add_reference(graph, object_instance, index, obj.reference)
 
             self._add_creation_date(graph, object_instance, index, obj.creation_date)
-            self._add_creation_date(graph, object_instance, index, obj.destruction_date)
+            self._add_destruction_date(graph, object_instance, index, obj.destruction_date)
 
             self._add_place_of_creation(graph, object_instance, index, obj.place_of_creation)
             self._add_place_of_destruction(graph, object_instance, index, obj.place_of_destruction)
@@ -112,6 +111,24 @@ class Mapper:
             )
 
             graph.add((object_instance, self.cidoc_crm.P2_has_type, type_instance))
+
+    def _add_description(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
+        
+        if value is None:
+            return
+
+        if isinstance(value, str):
+            value = [value]
+
+        for value_index, value_str in enumerate(value):
+            description_instance = self._get_or_create_instance_with_literal(
+                graph=graph,
+                instance_id=f"description-{instance_index}-{value_index}",
+                class_type=self.cidoc_crm.E62_String,
+                literal_value=value_str
+            )
+
+            graph.add((object_instance, self.cidoc_crm.P3_has_note, description_instance))
 
     def _add_material(self, graph: Graph, object_instance: URIRef, instance_index: int, value: str | list[str] | None) -> None:
 
@@ -456,7 +473,7 @@ class Mapper:
                 literal_value=collection.title
             )
 
-            graph.add((appellation_instance, self.cidoc_crm.P1_is_identified_by, appellation_instance))
+            graph.add((collection_instance, self.cidoc_crm.P1_is_identified_by, appellation_instance))
 
         if collection.description:
             description_instance = self._create_instance_with_literal(
@@ -466,7 +483,7 @@ class Mapper:
                 literal_value=collection.description
             )
 
-            graph.add((description_instance, self.cidoc_crm.P3_has_note, description_instance))
+            graph.add((collection_instance, self.cidoc_crm.P3_has_note, description_instance))
 
         if collection.id:
             identifier_instance = self._create_instance_with_literal(

@@ -12,17 +12,19 @@ class RequirementsValidator:
         self.loader = requirements_loader
         self.extractor = extractor
 
-    def validate(self, source: Source, file_content: list) -> None:
+    def validate(self, source: Source, file_content: list) -> list:
         required_fields: list[str] = self.loader.load_requirements(source)
 
+        validated = []
         for record in file_content:
-            if not self.is_record_valid(record, required_fields):
-                #TODO change exception to include more data (e.g. record failed, missing field)
-                raise ValueError("Invalid record")
-        
-        return
+            if not self._is_record_valid(record, required_fields):
+                continue
 
-    def is_record_valid(self, record: dict, requirements: list[str]) -> bool:
+            validated.append(record)
+        
+        return validated
+
+    def _is_record_valid(self, record: dict, requirements: list[str]) -> bool:
         for field in requirements:
             if not self.extractor.extract(record, field):
                 return False
