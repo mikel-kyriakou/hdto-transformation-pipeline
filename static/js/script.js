@@ -3,9 +3,33 @@ const submitButton = document.getElementById("submit-button");
 const resultCard = document.getElementById("result-card");
 const errorMessage = document.getElementById("error-message");
 const classBreakdown = document.getElementById("class-breakdown");
-const breakdownToggle = document.getElementById("class-breakdown-toggle");
+const classBreakdownPanel = document.getElementById("class-breakdown-panel");
 const downloadButton = document.getElementById("download-button");
+const viewButton = document.getElementById("view-button");
+const viewGraphButton = document.getElementById("view-graph-button");
+const graphModal = document.getElementById("graphModal");
+const graphContainer = document.getElementById("rdf-graph");
+const fileButton = document.getElementById("file-button");
+const textButton = document.getElementById("text-button");
+const fileInput = document.getElementById("input-file");
+const textInput = document.getElementById("input-text");
 let currentOutput = null;
+let rdfGraph = null;
+
+function setInputMode(mode) {
+    const useFile = mode === "file";
+    fileInput.disabled = !useFile;
+    fileInput.required = useFile;
+    textInput.disabled = useFile;
+    textInput.required = !useFile;
+    fileButton.classList.toggle("active", useFile);
+    textButton.classList.toggle("active", !useFile);
+    fileButton.setAttribute("aria-pressed", String(useFile));
+    textButton.setAttribute("aria-pressed", String(!useFile));
+}
+
+fileButton.addEventListener("click", () => setInputMode("file"));
+textButton.addEventListener("click", () => setInputMode("text"));
 
 function setMetric(id, value, suffix = "") {
     document.getElementById(id).textContent = value == null ? "-" : `${value}${suffix}`;
@@ -13,7 +37,11 @@ function setMetric(id, value, suffix = "") {
 
 function renderResult(payload) {
     const metrics = payload.metrics || {};
-    currentOutput = { content: payload.content, format: payload.format };
+    currentOutput = { content: payload.content, format: payload.format, triples: payload.triples || [] };
+    if (rdfGraph) {
+        rdfGraph.destroy();
+        rdfGraph = null;
+    }
     document.getElementById("rdfContent").textContent = payload.content;
 
     setMetric("metric-source", metrics.identified_source);
@@ -33,52 +61,50 @@ function renderResult(payload) {
         const badge = document.createElement("span");
         item.className = "list-group-item d-flex justify-content-between align-items-center";
         name.textContent = className;
-        badge.className = "badge text-bg-primary rounded-pill";
+        badge.className = "badge text-bg-secondary rounded-pill";
         badge.textContent = count;
         item.append(name, badge);
         classList.append(item);
     }
 
     const hasClassCounts = Object.keys(classCounts).length > 0;
-    breakdownToggle.hidden = !hasClassCounts;
+    classBreakdown.classList.toggle("d-none", !hasClassCounts);
     if (hasClassCounts) {
-        breakdownToggle.classList.remove("d-none");
-        breakdownToggle.textContent = "Show items per class";
-        breakdownToggle.setAttribute("aria-expanded", "false");
-        bootstrap.Collapse.getOrCreateInstance(classBreakdown, { toggle: false }).hide();
+        bootstrap.Collapse.getOrCreateInstance(classBreakdownPanel, { toggle: false }).hide();
     }
 
     downloadButton.disabled = false;
+    viewButton.disabled = false;
+    viewGraphButton.disabled = false;
     resultCard.classList.remove("d-none");
     resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-classBreakdown.addEventListener("show.bs.collapse", () => {
-    breakdownToggle.textContent = "Hide items per class";
-    breakdownToggle.setAttribute("aria-expanded", "true");
-});
-
-classBreakdown.addEventListener("hide.bs.collapse", () => {
-    breakdownToggle.textContent = "Show items per class";
-    breakdownToggle.setAttribute("aria-expanded", "false");
-});
-
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const fileInput = document.getElementById("input-file");
     const formatInput = document.getElementById("input-format");
-    if (fileInput.files.length === 0) {
+    let inputFile;
+    if (fileInput.disabled) {
+        const text = textInput.value.trim();
+        if (!text) {
+            errorMessage.textContent = "Please enter JSON text.";
+            errorMessage.hidden = false;
+            return;
+        }
+        inputFile = new File([text], "input.json", { type: "application/json" });
+    } else if (fileInput.files.length > 0) {
+        inputFile = fileInput.files[0];
+    } else {
         errorMessage.textContent = "Please select a JSON file.";
         errorMessage.hidden = false;
         return;
     }
 
     const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
+    formData.append("file", inputFile);
     formData.append("output_format", formatInput.value);
 
-    resultCard.classList.add("d-none");
     errorMessage.hidden = true;
     submitButton.disabled = true;
     submitButton.textContent = "Transforming...";
@@ -122,4 +148,117 @@ downloadButton.addEventListener("click", () => {
     link.click();
     link.remove();
     window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+});
+
+function compactUri(uri) {
+    const separator = Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/"));
+    return uri.slice(separator + 1) || uri;
+}
+
+function renderGraph() {
+    if (!currentOutput || currentOutput.triples.length === 0) {
+        graphContainer.textContent = "No RDF triples are available to display.";
+        return;
+    }
+
+    const nodeData = new Map();
+    const edgeData = [];
+    const addNode = (id, label, kind) => {
+        if (nodeData.has(id)) return;
+        const isLiteral = kind === "Literal";
+        const shortLabel = isLiteral ? label : compactUri(label);
+        nodeData.set(id, {
+            data: {
+                id,
+                label: shortLabel.length > 42 ? `${shortLabel.slice(0, 39)}...` : shortLabel,
+                details: `${label} (${kind})`,
+                kind: isLiteral ? "literal" : kind === "BNode" ? "blank" : "resource",
+            },
+        });
+    };
+
+    currentOutput.triples.forEach((triple, index) => {
+        addNode(triple.subject, triple.subject_label, triple.subject_kind);
+        addNode(triple.object, triple.object_label, triple.object_kind);
+        edgeData.push({
+            data: {
+                id: `triple-${index}`,
+                source: triple.subject,
+                target: triple.object,
+                label: compactUri(triple.predicate_label),
+                details: triple.predicate_label,
+            },
+        });
+    });
+
+    graphContainer.replaceChildren();
+    if (rdfGraph) rdfGraph.destroy();
+    rdfGraph = cytoscape({
+        container: graphContainer,
+        elements: [...nodeData.values(), ...edgeData],
+        style: [
+            {
+                selector: "node",
+                style: {
+                    label: "data(label)",
+                    "font-size": 12,
+                    "text-wrap": "wrap",
+                    "text-max-width": 150,
+                    "text-valign": "center",
+                    "text-halign": "center",
+                    color: "#222222",
+                    "background-color": "#a9574e",
+                    width: "label",
+                    height: "label",
+                    padding: "12px",
+                    "border-width": 1,
+                    "border-color": "#732526",
+                },
+            },
+            { selector: 'node[kind = "literal"]', style: { shape: "round-rectangle", "background-color": "#f4df9b", "border-color": "#ad8735" } },
+            { selector: 'node[kind = "blank"]', style: { shape: "diamond", "background-color": "#d8e2e8", "border-color": "#788b98" } },
+            {
+                selector: "edge",
+                style: {
+                    width: 1.5,
+                    "line-color": "#777777",
+                    "target-arrow-color": "#777777",
+                    "target-arrow-shape": "triangle",
+                    "curve-style": "bezier",
+                    label: "data(label)",
+                    "font-size": 10,
+                    color: "#383838",
+                    "text-background-color": "#fbfaf8",
+                    "text-background-opacity": 1,
+                    "text-background-padding": 2,
+                    "text-rotation": "autorotate",
+                },
+            },
+            { selector: ":selected", style: { "overlay-color": "#732526", "overlay-opacity": 0.15 } },
+        ],
+        layout: { name: "cose", animate: false, padding: 30, nodeRepulsion: 7000, idealEdgeLength: 110 },
+        minZoom: 0.2,
+        maxZoom: 3,
+        wheelSensitivity: 0.2,
+    });
+
+    rdfGraph.nodes().forEach((node) => node.qtip?.({ content: node.data("details") }));
+    rdfGraph.on("mouseover", "node, edge", (event) => {
+        graphContainer.title = event.target.data("details");
+    });
+}
+
+function showGraph() {
+    requestAnimationFrame(() => {
+        const shouldFit = !rdfGraph;
+        if (shouldFit) renderGraph();
+        rdfGraph?.resize();
+        if (shouldFit) rdfGraph?.fit(undefined, 30);
+    });
+}
+
+graphModal.addEventListener("shown.bs.modal", showGraph);
+
+document.getElementById("fit-graph-button").addEventListener("click", () => {
+    rdfGraph?.fit(undefined, 30);
 });

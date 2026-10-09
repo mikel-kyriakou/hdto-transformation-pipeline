@@ -46,6 +46,19 @@ class Pipeline:
         return PipelineResponse(
             content=graph.serialize(format=output_format),
             format=output_format.media_type,
+            triples=[
+                {
+                    "subject": subject.n3(),
+                    "subject_label": str(subject),
+                    "subject_kind": type(subject).__name__,
+                    "predicate": predicate.n3(),
+                    "predicate_label": str(predicate),
+                    "object": object_.n3(),
+                    "object_label": str(object_),
+                    "object_kind": type(object_).__name__,
+                }
+                for subject, predicate, object_ in graph
+            ],
             metrics=PipelineMetrics(
                 identified_source=source,
                 records_processed=len(file_content),

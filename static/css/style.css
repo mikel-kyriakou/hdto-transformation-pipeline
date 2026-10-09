@@ -1,179 +1,56 @@
-/* * {
-    box-sizing: border-box;
-}
-
 body {
-    margin: 0;
-    padding: 0;
-    font-family: "Avenir Next", Avenir, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    padding-top: 110px;
 }
 
-.container {
-    width: 90%;
-    max-width: 700px;
-    margin: 60px auto;
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 28px;
-    color: #222;
-}
-
-p {
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-input[type="file"],
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: white;
-    font-size: 14px;
-}
-
-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
+.my-button {
+    background-color: rgb(150, 92, 92);
     color: white;
-    font-size: 15px;
-    cursor: pointer;
+    border-color: rgb(150, 92, 92);
 }
 
-button:hover {
-    background-color: #555;
+.my-button:hover {
+    background-color: rgb(115, 37, 38);
+    border-color: rgb(115, 37, 38);
+    color: white;
 }
 
-button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
+#class-breakdown-list > .list-group-item:hover {
+    background-color: #e9ecef;
 }
 
-h2 {
-    margin: 0 0 20px;
-    font-size: 21px;
+#class-breakdown .accordion-item {
+    border-color: rgb(115, 37, 38);
 }
 
-h3 {
-    margin: 24px 0 10px;
-    font-size: 16px;
+#class-breakdown .accordion-button:not(.collapsed) {
+    color: rgb(115, 37, 38);
+    background-color: rgb(247, 238, 238);
+    box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) rgb(115, 37, 38);
 }
 
-.result {
-    margin-top: 36px;
-    padding-top: 28px;
-    border-top: 1px solid #ddd;
+#class-breakdown .accordion-button:focus {
+    border-color: rgb(115, 37, 38);
+    box-shadow: 0 0 0 0.25rem rgba(115, 37, 38, 0.2);
 }
 
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-    gap: 16px;
-    margin: 0;
+.metrics-card > .card-header {
+    background-color: white;
+    font-weight: bold;
+    border-bottom: none;
+
 }
 
-.metrics-grid div {
-    min-width: 0;
-    padding: 12px;
-    background: #f2f5f3;
-    border-left: 3px solid #4c7963;
-}
-
-.metrics-grid dt {
-    color: #555;
-    font-size: 13px;
-}
-
-.metrics-grid dd {
-    margin: 6px 0 0;
-    font-size: 18px;
-    font-weight: 700;
-    overflow-wrap: anywhere;
-}
-
-.class-breakdown table {
+#rdf-graph {
     width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+    height: min(65vh, 680px);
+    min-height: 360px;
+    border: 1px solid #dee2e6;
+    background-color: #fbfaf8;
 }
 
-.class-breakdown th,
-.class-breakdown td {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-    overflow-wrap: anywhere;
-}
-
-.result-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 24px;
-}
-
-.secondary-button {
-    background: #4c7963;
-}
-
-.secondary-button:hover {
-    background: #3b604e;
-}
-
-.rdf-content {
-    display: block;
-    width: 100%;
-    min-height: 280px;
-    margin-top: 16px;
-    padding: 12px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    background: #fafafa;
-    color: #222;
-    font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
-    resize: vertical;
-    white-space: pre;
-}
-
-.error-message {
-    margin: 16px 0 0;
-    color: #a12622;
-    font-weight: 600;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-@media (max-width: 520px) {
-    .container {
-        width: calc(100% - 28px);
-        margin: 20px auto;
-        padding: 24px 18px;
+@media (max-width: 575.98px) {
+    #rdf-graph {
+        height: 58vh;
+        min-height: 320px;
     }
-
-    .result-actions button {
-        flex: 1 1 140px;
-    }
-} */
+}

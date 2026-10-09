@@ -82,3 +82,4 @@ class PipelineResponse(BaseModel):
     content: str
     format: MediaType
     metrics: PipelineMetrics
+    triples: list[dict[str, str]]
