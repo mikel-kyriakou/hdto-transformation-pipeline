@@ -112,7 +112,7 @@ form.addEventListener("submit", async (event) => {
     currentOutput = null;
 
     try {
-        const response = await fetch("/generate-rdf", { method: "POST", body: formData });
+        const response = await fetch("/hdto/generate-rdf", { method: "POST", body: formData });
         const payload = await response.json();
         if (!response.ok) {
             const detail = payload?.detail;

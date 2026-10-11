@@ -12,7 +12,7 @@ from app.pipeline.pipeline import Pipeline, build_pipeline
 from app.models.enums import OutputFormat
 from app.models.models import PipelineResponse
 
-app = FastAPI()
+app = FastAPI(root_path="/hdto")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
