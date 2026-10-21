@@ -13,16 +13,16 @@ This guide explains how to use the web interface. You do not need to install any
 3. Choose an **Output Format**:
    - **XML** creates RDF/XML.
    - **Turtle** creates Turtle RDF.
-<img src="./docs/images/input-section-new.png" alt="Input panel showing the file and text options" width="300">
+   <img src="./docs/images/input-section-new.png" alt="Input panel showing the file and text options" width="300">
 4. Select **Transform**. The tool detects the source format, checks required fields, and creates the RDF output.
 5. Review the **Results** summary. It shows the detected source, processing duration, records processed, valid and invalid records, and triples generated. If shown, **Instances per class** gives a count of the different HDTO classes in the result.
 6. Explore the result:
    - Select **View Text** to read the generated RDF.
    - Select **View Graph** to see the resources and relationships as a diagram. You can move around the graph and use **Fit graph** to bring it back into view.
    - If there are invalid records, select **View Invalid Records** to see each record’s number, missing fields, and original content.
-<img src="./docs/images/invalid-records-modal.png" alt="Invalid records report" width="300">
+   <img src="./docs/images/invalid-records-modal.png" alt="Invalid records report" width="300">
 7. Select **Download** to save the generated RDF file. XML downloads as `.rdf`; Turtle downloads as `.ttl`.
-<img src="./docs/images/results-invalid-rec.png" alt="Transformation results" width="500">
+   <img src="./docs/images/results-invalid-rec.png" alt="Transformation results" width="500">
 
 ## What input can I use?
 
