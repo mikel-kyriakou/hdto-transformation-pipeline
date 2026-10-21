@@ -66,6 +66,27 @@
                             </div>
                             <button id="submit-button" type="submit" class="btn my-button">Transform</button>
                         </form>
+                        <div class="accordion mt-3" id="custom-input-template">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="custom-input-template-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#custom-input-template-panel" aria-expanded="false" aria-controls="custom-input-template-panel">
+                                        Custom Input template
+                                    </button>
+                                </h2>
+                                <div id="custom-input-template-panel" class="accordion-collapse collapse" aria-labelledby="custom-input-template-heading" data-bs-parent="#custom-input-template">
+                                    <div class="accordion-body">
+                                        <div class="d-flex gap-2">
+                                            <button id="download-custom-input-template" type="button" class="btn btn-outline-secondary">
+                                                <i class="bi bi-download"></i> Download
+                                            </button>
+                                            <button id="view-custom-input-template" type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#customInputTemplateModal">
+                                                <i class="bi bi-braces"></i> View
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <p id="error-message" class="error-message" role="alert" hidden></p>
                     </div>
                 </div>
@@ -170,6 +191,23 @@
                     </div>
                     <div class="modal-body">
                         <pre class="bg-body-tertiary border rounded p-3 mb-0"><code id="rdfContent"></code></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="customInputTemplateModal" tabindex="-1" aria-labelledby="customInputTemplateModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="customInputTemplateModalTitle">Custom Input template</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre class="bg-body-tertiary border rounded p-3 mb-0"><code id="customInputTemplateContent"></code></pre>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

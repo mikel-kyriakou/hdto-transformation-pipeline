@@ -13,8 +13,38 @@ const fileButton = document.getElementById("file-button");
 const textButton = document.getElementById("text-button");
 const fileInput = document.getElementById("input-file");
 const textInput = document.getElementById("input-text");
+const customInputTemplate = {
+    id: "object-001",
+    title: "Ancient Greek vase",
+    object_type: "Amphora",
+    creator: "Unknown potter",
+    date_of_creation: "5th century BCE",
+    place_of_creation: "Athens, Greece",
+    material: "Terracotta",
+    dimensions: "Height: 35 cm; diameter: 22 cm",
+    cultural_period: "Classical Greece",
+    digital_file: {
+        file_type: "3D model",
+        format: "glTF",
+        representation: "ancient-greek-vase.glb",
+    },
+};
+const customInputTemplateJson = JSON.stringify(customInputTemplate, null, 2);
 let currentOutput = null;
 let rdfGraph = null;
+
+document.getElementById("customInputTemplateContent").textContent = customInputTemplateJson;
+document.getElementById("download-custom-input-template").addEventListener("click", () => {
+    const blob = new Blob([customInputTemplateJson], { type: "application/json" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "custom-input-template.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+});
 
 function setInputMode(mode) {
     const useFile = mode === "file";

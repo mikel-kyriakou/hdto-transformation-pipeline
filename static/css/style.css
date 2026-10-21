@@ -33,6 +33,41 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(115, 37, 38, 0.2);
 }
 
+#custom-input-template .accordion-item {
+    border: 0;
+}
+
+#custom-input-template .accordion-button {
+    width: fit-content;
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+#custom-input-template .accordion-button::after {
+    margin-left: 0.5rem;
+}
+
+#custom-input-template .accordion-button:not(.collapsed),
+#custom-input-template .accordion-button:focus,
+#custom-input-template .accordion-button:hover {
+    color: #6c757d;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+#custom-input-template .accordion-body {
+    padding: 0.5rem 0.75rem 0.5rem 0;
+}
+
+#custom-input-template .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
 .metrics-card > .card-header {
     background-color: white;
     font-weight: bold;
