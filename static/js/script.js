@@ -26,6 +26,7 @@ const customInputTemplate = {
     dimensions: "Height: 35 cm; diameter: 22 cm",
     cultural_period: "Classical Greece",
     digital_file: {
+        file_url: "https://example.com/ancient-greek-vase.glb",
         file_type: "3D model",
         format: "glTF",
         representation: "ancient-greek-vase.glb",

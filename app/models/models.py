@@ -7,7 +7,8 @@ from app.models.enums import Source
 
 
 class DigitalFile(BaseModel):
-    representation: str
+    file_url: str | None = None
+    representation: str | None = None
     file_type: str | None = None
     format: str | None = None
     
