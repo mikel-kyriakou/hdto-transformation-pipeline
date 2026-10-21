@@ -37,7 +37,7 @@ class Pipeline:
 
         source = self.source_identifier.identify_source(file_content)
 
-        validated_objects = self.requirements_validator.validate(source, file_content)
+        validated_objects, invalid_records = self.requirements_validator.validate(source, file_content)
 
         intermediate_objects = self.transformer.transform(source, validated_objects)
 
@@ -63,10 +63,11 @@ class Pipeline:
                 identified_source=source,
                 records_processed=len(file_content),
                 records_valid=len(validated_objects),
-                records_invalid=len(file_content)-len(validated_objects),
+                records_invalid=len(invalid_records),
                 triples_generated=len(graph),
                 duration_s=round(time.perf_counter() - start, 3),
-                items_per_class=MetricsGenerator.items_per_class(graph)
+                items_per_class=MetricsGenerator.items_per_class(graph),
+                invalid_records_data=invalid_records
             )
         )
 

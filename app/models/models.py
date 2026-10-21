@@ -1,3 +1,5 @@
+import json
+
 from pydantic import BaseModel
 
 from app.models.enums import MediaType
@@ -5,22 +7,22 @@ from app.models.enums import Source
 
 
 class DigitalFile(BaseModel):
-    file_type: str
-    format: str
     representation: str
-
+    file_type: str | None = None
+    format: str | None = None
+    
 
 class CustomMetadata(BaseModel):
-    id: str
-    title: str
-    object_type: str
-    creator: str
-    date_of_creation: str
-    place_of_creation: str
-    material: str
-    dimensions: str
-    cultural_period: str
-    digital_file: DigitalFile
+    id: str | None
+    title: str | None
+    object_type: str | None
+    creator: str | None
+    date_of_creation: str | None
+    place_of_creation: str | None
+    material: str | None
+    dimensions: str | None
+    cultural_period: str | None 
+    digital_file: DigitalFile | None
 
 
 class Collection(BaseModel):
@@ -68,6 +70,10 @@ class HeritageObjectData(BaseModel):
 
     digital_representation: str | None = None #the 3d model
 
+class InvalidRecordsData(BaseModel):
+    index: int
+    content: dict
+    missing_fields: list[str]
 
 class PipelineMetrics(BaseModel):
     identified_source: Source | None = None
@@ -77,6 +83,7 @@ class PipelineMetrics(BaseModel):
     triples_generated: int | None = None
     duration_s: int | float | None = None
     items_per_class: dict[str, int] = {}
+    invalid_records_data: list[InvalidRecordsData] | None = None
 
 class PipelineResponse(BaseModel):
     content: str

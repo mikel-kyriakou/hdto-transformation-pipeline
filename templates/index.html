@@ -174,6 +174,9 @@
                         <i class="bi bi-diagram-2"></i> View Graph
                     </button>
                 </div>
+                <button id="invalid-records-button" type="button" class="btn btn-outline-danger ms-2 d-none" data-bs-toggle="modal" data-bs-target="#invalidRecordsModal">
+                    <i class="bi bi-exclamation-triangle"></i> View Invalid Records
+                </button>
                 <button id="download-button" type="button" class="btn my-button ms-auto" disabled>
                     <i class="bi bi-download"></i> Download
                 </button>
@@ -199,6 +202,23 @@
             </div>
         </div>
 
+        <div class="modal fade" id="invalidRecordsModal" tabindex="-1" aria-labelledby="invalidRecordsModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="invalidRecordsModalTitle">Invalid Records Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="invalid-records-list" class="list-group"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="customInputTemplateModal" tabindex="-1" aria-labelledby="customInputTemplateModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
@@ -207,6 +227,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="small text-secondary">
+                            Include all fields shown in this template. The following fields must also have a value:
+                            <code>id</code>, <code>title</code>, and <code>digital_file.representation</code>.
+                        </p>
                         <pre class="bg-body-tertiary border rounded p-3 mb-0"><code id="customInputTemplateContent"></code></pre>
                     </div>
                     <div class="modal-footer">
@@ -230,6 +254,17 @@
                         <div id="rdf-graph" role="img" aria-label="Interactive graph of the generated RDF"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="error-toast" class="toast border-danger" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="bi bi-x-circle-fill text-danger me-2" aria-hidden="true"></i>
+                    <strong class="me-auto">Transformation failed</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div id="error-toast-message" class="toast-body"></div>
             </div>
         </div>
     </main>

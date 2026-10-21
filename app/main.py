@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Form, Request, UploadFile, Depends, Response
+import logging
+
+from fastapi import FastAPI, Form, Request, UploadFile, Depends, Response, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +11,8 @@ from app.services.temp import TempService, get_temp_service
 from app.pipeline.pipeline import Pipeline, build_pipeline
 from app.models.enums import OutputFormat
 from app.models.models import PipelineResponse
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(root_path="/hdto")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -32,4 +36,11 @@ async def generate_rdf(
     file: UploadFile,
     output_format: Annotated[OutputFormat, Form()]
 ) -> PipelineResponse:
-    return await pipeline.execute(file, output_format)
+    try:
+        return await pipeline.execute(file, output_format)
+    except ValueError as e:
+        logger.error("Pipeline request failed: %s", e, exc_info=True)
+        raise HTTPException(
+            detail=str(e),
+            status_code=400
+        )

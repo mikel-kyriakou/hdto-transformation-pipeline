@@ -4,6 +4,7 @@ from fastapi import Depends
 from app.rules.loader import RulesLoader
 from app.extraction.extractor import Extractor
 from app.models.enums import Source
+from app.models.models import InvalidRecordsData
 
 
 class RequirementsValidator:
@@ -12,24 +13,34 @@ class RequirementsValidator:
         self.loader = requirements_loader
         self.extractor = extractor
 
-    def validate(self, source: Source, file_content: list) -> list:
+    def validate(self, source: Source, file_content: list) -> tuple[list, list[InvalidRecordsData]]:
         required_fields: list[str] = self.loader.load_requirements(source)
 
         validated = []
-        for record in file_content:
-            if not self._is_record_valid(record, required_fields):
+        invalid_records = []
+        for index, record in enumerate(file_content, start=1):
+            missing_fields = self._get_missing_fields(record, required_fields)
+            if missing_fields:
+                invalid_records.append(
+                    InvalidRecordsData(
+                        index=index,
+                        content=record,
+                        missing_fields=missing_fields
+                    )
+                )
                 continue
 
             validated.append(record)
         
-        return validated
+        return validated, invalid_records
 
-    def _is_record_valid(self, record: dict, requirements: list[str]) -> bool:
+    def _get_missing_fields(self, record: dict, requirements: list[str]) -> list[str]:
+        missing_fields = []
         for field in requirements:
             if not self.extractor.extract(record, field):
-                return False
+                missing_fields.append(field)
 
-        return True
+        return missing_fields
 
 def get_requirements_validator(
         requirements_loader: Annotated[RulesLoader, Depends()],

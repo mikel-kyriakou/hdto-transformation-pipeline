@@ -48,10 +48,10 @@ def test_valid_record_passes(validator):
         }
     }
 
-    assert validator.is_record_valid(
-        record,
-        ["title", "creator", "digital_file.file_url"]
-    )
+    validated, invalid = validator.validate(Source.CUSTOM, [record])
+
+    assert validated == [record]
+    assert invalid == []
 
 
 def test_missing_required_field_fails(validator):
@@ -62,10 +62,11 @@ def test_missing_required_field_fails(validator):
         }
     }
 
-    assert not validator.is_record_valid(
-        record,
-        ["title", "creator", "digital_file.file_url"]
-    )
+    validated, invalid = validator.validate(Source.CUSTOM, [record])
+
+    assert validated == []
+    assert len(invalid) == 1
+    assert invalid[0].missing_fields == ["creator"]
 
 
 def test_empty_value_fails(validator):
@@ -77,10 +78,11 @@ def test_empty_value_fails(validator):
         }
     }
 
-    assert not validator.is_record_valid(
-        record,
-        ["title", "creator", "digital_file.file_url"]
-    )
+    validated, invalid = validator.validate(Source.CUSTOM, [record])
+
+    assert validated == []
+    assert len(invalid) == 1
+    assert invalid[0].missing_fields == ["title"]
 
 
 def test_validate_accepts_all_records(validator):
@@ -104,7 +106,30 @@ def test_validate_accepts_all_records(validator):
     validator.validate(Source.CUSTOM, records)
 
 
-def test_validate_raises_error_for_invalid_record(validator):
+def test_invalid_record_index_is_one_based(validator):
+    records = [
+        {
+            "title": "Object 1",
+            "creator": "Museum",
+            "digital_file": {
+                "file_url": "http://example.com/1.obj"
+            }
+        },
+        {
+            "title": "Object 2",
+            "creator": "Museum"
+        }
+    ]
+
+    validated, invalid = validator.validate(Source.CUSTOM, records)
+
+    assert validated == records[:1]
+    assert len(invalid) == 1
+    assert invalid[0].index == 2
+    assert invalid[0].missing_fields == ["digital_file.file_url"]
+
+
+def test_validate_returns_invalid_record_details(validator):
     records = [
         {
             "title": "Object 1",
@@ -118,5 +143,10 @@ def test_validate_raises_error_for_invalid_record(validator):
         }
     ]
 
-    with pytest.raises(ValueError, match="Invalid record"):
-        validator.validate(Source.CUSTOM, records)
+    validated, invalid = validator.validate(Source.CUSTOM, records)
+
+    assert validated == records[:1]
+    assert len(invalid) == 1
+    assert invalid[0].index == 2
+    assert invalid[0].content == records[1]
+    assert invalid[0].missing_fields == ["creator", "digital_file.file_url"]
